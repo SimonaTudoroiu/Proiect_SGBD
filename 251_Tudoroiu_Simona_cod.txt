@@ -1,0 +1,1550 @@
+--Creare + inserare
+create table tara
+(
+id_tara number(5),
+nume varchar(25) constraint nume_tara_nn not null,
+unique (nume)
+);
+alter table tara
+add constraint id_tara_pk primary key(id_tara);
+
+create table oras 
+(
+id_oras number(5),
+nume varchar(25) constraint nume_oras_nn not null,
+id_tara number(5),
+unique (nume)
+);
+alter table oras
+add constraint id_oras_pk primary key(id_oras);
+alter table oras
+add constraint id_tara_fk foreign key(id_tara) references tara(id_tara);
+
+create table centru_de_adoptie
+(
+id_centru number(5),
+nume varchar(50) constraint nume_centru_nn not null,
+data_aparitie date constraint aparitie_nn not null,
+nr_animale_adoptate number(10),
+id_oras number(5),
+unique (nume)
+);
+alter table centru_de_adoptie
+add constraint id_centru_pk primary key(id_centru);
+alter table centru_de_adoptie
+add constraint id_oras_fk foreign key(id_oras) references oras(id_oras);
+
+create table hrana_animale
+(
+id_hrana number(5),
+nume varchar(30) constraint nume_hrana_nn not null,
+cantitate number(3) constraint cantitate_hrana_nn not null,
+id_centru number(5),
+constraint id_hrana_pk primary key(id_hrana),
+constraint id_centru_fk foreign key(id_centru) references centru_de_adoptie(id_centru)
+);
+
+create table animal
+(
+id_animal number(5),
+nume_rasa varchar(25),
+varsta number(3) constraint varsta_animal_nn not null,
+nume varchar(25),
+id_centru number(5),
+pedigree varchar(10) constraint pedigree_nn not null,
+constraint id_animal_pk primary key(id_animal),
+constraint id_centru_2_fk foreign key(id_centru) references centru_de_adoptie(id_centru),
+constraint pedigree_a check (pedigree='are' or pedigree='nu are')
+);
+
+create table vaccin 
+(
+id_vaccin number(5),
+nume varchar(30) constraint nume_vaccin_nn not null,
+data_administrare date constraint data_vaccin_nn not null,
+id_animal number(5),
+constraint id_vaccin_pk primary key(id_vaccin),
+constraint id_animal_fk foreign key(id_animal) references animal(id_animal)
+);
+
+create table carnet_vaccinuri
+(
+id_carnet number(5),
+id_animal number(5),
+id_vaccin number(5),
+nr_vaccinuri number(2) constraint nr_vaccinuri_nn not null,
+data_urmatorului_vaccin date,
+constraint pk_carnet_animal_vaccin primary key(id_carnet, id_animal, id_vaccin),
+constraint id_animal_2_fk foreign key (id_animal) references animal (id_animal),
+constraint id_vaccin_fk foreign key (id_vaccin) references vaccin (id_vaccin)
+);
+
+create table boala
+(
+id_boala number(5),
+nume varchar(30) constraint nume_boala_nn not null,
+gravitate number(2) constraint gravitate_boala_nn not null,
+constraint id_boala_pk primary key (id_boala)
+);
+
+
+create table medicament 
+(
+id_medicament number(5),
+nume varchar(30) constraint nume_medicament_nn not null,
+doza_pe_zi number(2) constraint doza_medicament_nn not null,
+constraint id_medicament_pk primary key (id_medicament)
+);
+
+create table personal
+(
+id_personal number(5),
+nr_angajati number(4) constraint nr_angajati_nn not null,
+salariu_minim number(5) constraint sal_min_p_nn not null,
+salariu_maxim number(5) constraint sal_max_p_nn not null,
+id_centru number(5),
+constraint id_personal_pk primary key (id_personal),
+constraint id_centru_3_fk foreign key (id_centru) references centru_de_adoptie (id_centru)
+);
+
+create table departament 
+( 
+id_departament number(5),
+nume varchar(25) constraint nume_departament_nn not null,
+nr_persoane number(3) constraint nr_persoane_d_nn not null,
+salariu_minim number(5) constraint sal_min_d_nn not null,
+salariu_maxim number(5) constraint sal_max_d_nn not null,
+id_personal number(5),
+constraint id_departament_pk primary key (id_departament),
+constraint id_personal_fk foreign key (id_personal) references personal (id_personal)
+);
+
+create table job
+(
+id_job number(5),
+nume varchar(30) constraint nume_job_nn not null,
+salariu number(5) constraint salariu_job_nn not null,
+id_departament number(5),
+constraint id_job_pk primary key (id_job),
+constraint id_departament_fk foreign key (id_departament) references departament (id_departament)
+);
+
+create table angajat
+(
+id_angajat number(5),
+nume varchar(30) constraint nume_angajat_nn not null,
+prenume varchar(30) constraint prenume_angajat_nn not null,
+varsta number(2) constraint varsta_angajat_nn not null,
+data_nasterii date constraint data_angajat_nn not null,
+salariu number(5) constraint salariu_angajat_nn not null,
+id_job number(5),
+constraint id_angajat_pk primary key(id_angajat),
+constraint id_job_fk foreign key(id_job) references job (id_job)
+);
+
+create table sufera 
+(
+id_animal number(5),
+id_boala number(5), 
+constraint pk_animal_boala primary key (id_animal, id_boala),
+constraint id_animal_4_fk foreign key (id_animal) references animal(id_animal),
+constraint id_boala_2_fk foreign key (id_boala) references boala (id_boala)
+);
+
+create table se_treateaza 
+(
+id_boala number(5),
+id_medicament number(5),
+constraint pk_boala_medicament primary key (id_boala, id_medicament),
+constraint id_boala_3_fk foreign key (id_boala) references boala (id_boala),
+constraint id_medicament_fk foreign key (id_medicament) references medicament(id_medicament)
+);
+
+create table mananca
+(
+id_animal number(5),
+id_hrana number(5), 
+constraint pk_animal_hrana primary key (id_animal, id_hrana),
+constraint id_animal_5_fk foreign key (id_animal) references animal(id_animal),
+constraint id_hrana_2_fk foreign key (id_hrana) references hrana_animale (id_hrana)
+);
+
+ex 13.
+create sequence seq_tara
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into tara
+values(seq_tara.nextval, 'Romania');
+
+insert into tara
+values(seq_tara.nextval, 'Franta');
+
+insert into tara
+values(seq_tara.nextval, 'Germania');
+
+insert into tara
+values(seq_tara.nextval, 'Italia');
+
+insert into tara
+values(seq_tara.nextval, 'Bulgaria');
+
+insert into tara
+values(seq_tara.nextval, 'Ucraina');
+
+insert into tara
+values(seq_tara.nextval, 'Spania');
+
+insert into tara
+values(seq_tara.nextval, 'Ungaria');
+
+insert into tara
+values(seq_tara.nextval, 'Polonia');
+
+insert into tara
+values(seq_tara.nextval, 'Danemarca');
+
+commit;
+
+create sequence seq_oras
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into oras
+values(seq_oras.nextval, 'Constanta', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Craiova', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Roma', 4);
+
+insert into oras
+values(seq_oras.nextval, 'Barcelona', 7);
+
+insert into oras
+values(seq_oras.nextval, 'Navodari', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Bucuresti', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Verona', 4);
+
+insert into oras
+values(seq_oras.nextval, 'Timisoara', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Alba-Iulia', 1);
+
+insert into oras
+values(seq_oras.nextval, 'Iasi', 1);
+
+commit;
+
+
+create sequence seq_centru
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Animalutele fericite', TO_DATE('12-03-2004', 'dd-mm-yyyy'), 100, 2);
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Adopta un prieten', TO_DATE('02-11-2010', 'dd-mm-yyyy'), 150, 6);
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Animalul tau', TO_DATE('25-06-2012', 'dd-mm-yyyy'), 98, 10);
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Adopta-ma!', TO_DATE('16-09-2006', 'dd-mm-yyyy'), 200, 4);
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Animale prietenoase', TO_DATE('05-10-2013', 'dd-mm-yyyy'), 59, 5);
+
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'Animalutele fericite', TO_DATE('12-03-2004', 'dd-mm-yyyy'), 100, 2);
+
+commit;
+
+
+create sequence seq_hrana
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Chonk', 300, 1);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Cocomel', 579, 2);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Papbun', 400, 3);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Falrel', 280, 4);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Varel', 600, 5);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Chonk', 250, 2);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Chonk', 190, 5);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Cocomel', 398, 1);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Cocomel', 400, 4);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Varel', 387, 3);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Papbun', 376, 1);
+
+insert into hrana_animale
+values(seq_hrana.nextval, 'Falrel', 578, 5);
+
+commit;
+
+
+create sequence seq_animal
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into animal
+values(seq_animal.nextval, 'British', 3, 'Mimi', 2, 'are');
+
+insert into animal
+values(seq_animal.nextval, 'Scotish', 1, 'Misha', 5, 'nu are');
+
+insert into animal
+values(seq_animal.nextval, 'nu stim', 2, 'Cara', 4,'nu are');
+
+insert into animal
+values(seq_animal.nextval, 'Labrador', 4, 'Rex', 1,'are');
+
+insert into animal
+values(seq_animal.nextval, 'Pug', 1, 'Boni', 3,'nu are');
+
+commit;
+
+
+create sequence seq_vaccin
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into vaccin
+values(seq_vaccin.nextval, 'Eurican', TO_DATE('12-04-2005', 'dd-mm-yyyy'),1);
+
+insert into vaccin
+values(seq_vaccin.nextval, 'Rabisim', TO_DATE('04-03-2010', 'dd-mm-yyyy'),2);
+
+insert into vaccin
+values(seq_vaccin.nextval, 'Purevax', TO_DATE('24-11-2006', 'dd-mm-yyyy'),3);
+
+insert into vaccin
+values(seq_vaccin.nextval, 'Primodog', TO_DATE('15-12-2013', 'dd-mm-yyyy'),4);
+
+insert into vaccin
+values(seq_vaccin.nextval, 'Eurican', TO_DATE('02-09-2012', 'dd-mm-yyyy'),5);
+
+
+commit;
+
+
+create sequence seq_carnet
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into carnet_vaccinuri
+values(seq_carnet.nextval, 1, 3, 1, TO_DATE('23-07-2022', 'dd-mm-yyyy'));
+
+insert into carnet_vaccinuri
+values(seq_carnet.nextval, 2, 1, 3, TO_DATE('12-09-2022', 'dd-mm-yyyy'));
+
+insert into carnet_vaccinuri
+values(seq_carnet.nextval, 3, 5, 6, TO_DATE('15-10-2022', 'dd-mm-yyyy'));
+
+insert into carnet_vaccinuri
+values(seq_carnet.nextval, 4, 2, 2, TO_DATE('13-11-2022', 'dd-mm-yyyy'));
+
+insert into carnet_vaccinuri
+values(seq_carnet.nextval, 5, 4, 1, TO_DATE('25-08-2022', 'dd-mm-yyyy'));
+
+commit;
+
+create sequence seq_boala
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into boala
+values(seq_boala.nextval, 'Parazitoza', 3);
+
+insert into boala
+values(seq_boala.nextval, 'Salmoneloza', 6);
+
+insert into boala
+values(seq_boala.nextval, 'Stenoza Aortica', 10);
+
+insert into boala
+values(seq_boala.nextval, 'Toxopalsmoza', 4);
+
+insert into boala
+values(seq_boala.nextval, 'Otita', 5);
+
+commit;
+
+
+create sequence seq_medicament
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into medicament
+values(seq_medicament.nextval, 'Brufil', 3);
+
+insert into medicament
+values(seq_medicament.nextval, 'Iosman', 2);
+
+insert into medicament
+values(seq_medicament.nextval, 'Calmarin', 1);
+
+insert into medicament
+values(seq_medicament.nextval, 'Maldon', 1);
+
+insert into medicament
+values(seq_medicament.nextval, 'Aurilo', 2);
+
+commit;
+
+
+create sequence seq_personal
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into personal
+values(seq_personal.nextval, 100, 1300, 3000, 1);
+
+insert into personal
+values(seq_personal.nextval, 210, 1250, 2998, 2);
+
+insert into personal
+values(seq_personal.nextval, 87, 1100, 2500, 3);
+
+insert into personal
+values(seq_personal.nextval, 180, 1400, 3100, 4);
+
+insert into personal
+values(seq_personal.nextval, 150, 1247, 2876, 5);
+
+commit;
+
+
+create sequence seq_departament
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',30, 1300, 1400, 1);
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',25, 1250, 1300, 2);
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',15, 1100, 1278, 3);
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',40, 1400, 1500, 4);
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',35, 1247, 1350, 5);
+
+insert into departament
+values(seq_departament.nextval, 'Curatenie',30, 1300, 1400, 1);
+
+insert into departament
+values(seq_departament.nextval, 'Doctori',50, 2500, 3000, 1);
+
+insert into departament
+values(seq_departament.nextval, 'Doctori',100, 2480, 2998, 2);
+
+insert into departament
+values(seq_departament.nextval, 'Doctori',45, 2000, 2500, 3);
+
+insert into departament
+values(seq_departament.nextval, 'Doctori',68, 2657, 3100, 4);
+
+insert into departament
+values(seq_departament.nextval, 'Doctori',48, 2150, 2876, 5);
+
+insert into departament
+values(seq_departament.nextval, 'Administratie',20, 1500, 2500, 1);
+
+insert into departament
+values(seq_departament.nextval, 'Administratie',85, 1458, 2480, 2);
+
+insert into departament
+values(seq_departament.nextval, 'Administratie',27, 1376, 2000, 3);
+
+insert into departament
+values(seq_departament.nextval, 'Administratie',72, 2000, 2657, 4);
+
+insert into departament
+values(seq_departament.nextval, 'Administratie',67, 1500, 2150, 5);
+
+commit;
+
+create sequence seq_job
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into job
+values(seq_job.nextval, 'Ingrijitor animale',1300, 1);
+
+insert into job
+values(seq_job.nextval, 'Om de serviciu',1400, 1);
+
+insert into job
+values(seq_job.nextval, 'Ingrijitor animale',1250, 2);
+
+insert into job
+values(seq_job.nextval, 'Om de serviciu',1300, 2);
+
+insert into job
+values(seq_job.nextval, 'Ingrijitor animale',1100, 3);
+
+insert into job
+values(seq_job.nextval, 'Om de serviciu',1278, 3);
+
+insert into job
+values(seq_job.nextval, 'Ingrijitor animale',1400, 4);
+
+insert into job
+values(seq_job.nextval, 'Om de serviciu',1500, 4);
+
+insert into job
+values(seq_job.nextval, 'Ingrijitor animale',1247, 5);
+
+insert into job
+values(seq_job.nextval, 'Om de serviciu',1350, 5);
+
+insert into job
+values(seq_job.nextval, 'Medic veterinar',2500, 6);
+
+insert into job
+values(seq_job.nextval, 'Chirurg veterinar',3000, 6);
+
+insert into job
+values(seq_job.nextval, 'Medic veterinar',2480, 7);
+
+insert into job
+values(seq_job.nextval, 'Chirurg veterinar',2998, 7);
+
+insert into job
+values(seq_job.nextval, 'Medic veterinar',2000, 8);
+
+insert into job
+values(seq_job.nextval, 'Chirurg veterinar',2500, 8);
+
+insert into job
+values(seq_job.nextval, 'Medic veterinar',2657, 9);
+
+insert into job
+values(seq_job.nextval, 'Chirurg veterinar',3100, 9);
+
+insert into job
+values(seq_job.nextval, 'Medic veterinar',2150, 10);
+
+insert into job
+values(seq_job.nextval, 'Chirurg veterinar',2876, 10);
+
+insert into job
+values(seq_job.nextval, 'Casier',1500, 11);
+
+insert into job
+values(seq_job.nextval, 'Manager',2500, 11);
+
+insert into job
+values(seq_job.nextval, 'Casier',1458, 12);
+
+insert into job
+values(seq_job.nextval, 'Manager',2480, 12);
+
+insert into job
+values(seq_job.nextval, 'Casier',1376, 13);
+
+insert into job
+values(seq_job.nextval, 'Manager',2000, 13);
+
+insert into job
+values(seq_job.nextval, 'Casier',2000, 14);
+
+insert into job
+values(seq_job.nextval, 'Manager',2657, 14);
+
+insert into job
+values(seq_job.nextval, 'Casier',1500, 15);
+
+insert into job
+values(seq_job.nextval, 'Manager',2150, 15);
+
+commit;
+
+
+create sequence seq_angajat
+increment by 1
+start with 1
+maxvalue 10000
+nocycle;
+
+insert into angajat
+values(seq_angajat.nextval, 'Agache','Cosmin', 20,TO_DATE('12-03-2002', 'dd-mm-yyyy'), 1300, 1);
+
+insert into angajat
+values(seq_angajat.nextval, 'Popa','Andrei',  35, TO_DATE('09-10-1987', 'dd-mm-yyyy'),1400, 2);
+
+insert into angajat
+values(seq_angajat.nextval, 'Marius','Andrei', 48, TO_DATE('10-02-1974', 'dd-mm-yyyy'), 1250, 3);
+
+insert into angajat
+values(seq_angajat.nextval, 'Marian','Maria',  40, TO_DATE('20-12-1982', 'dd-mm-yyyy'),1300, 4);
+
+insert into angajat
+values(seq_angajat.nextval, 'Coman','Alexandru',  38, TO_DATE('24-06-1984', 'dd-mm-yyyy'),1100, 5);
+
+insert into angajat
+values(seq_angajat.nextval, 'Popescu','Alina', 28,TO_DATE('30-09-1994', 'dd-mm-yyyy'), 1278, 6);
+
+insert into angajat
+values(seq_angajat.nextval, 'Alexandru','Ion', 50,TO_DATE('14-01-1972', 'dd-mm-yyyy'), 1400, 7);
+
+insert into angajat
+values(seq_angajat.nextval, 'Oleanu','Marian', 43,TO_DATE('08-08-1987', 'dd-mm-yyyy'), 1500, 8);
+
+insert into angajat
+values(seq_angajat.nextval, 'Cornel','Maria', 35,TO_DATE('24-06-1987', 'dd-mm-yyyy'), 1247, 9);
+
+insert into angajat
+values(seq_angajat.nextval, 'Gheorghe','Andrei', 46,TO_DATE('09-06-1976', 'dd-mm-yyyy'), 1350, 10);
+
+insert into angajat
+values(seq_angajat.nextval, 'Stoica','Carina', 40, TO_DATE('05-11-1982', 'dd-mm-yyyy'),2500, 11);
+
+insert into angajat
+values(seq_angajat.nextval, 'Petru','Matei', 45,TO_DATE('13-05-1977', 'dd-mm-yyyy'), 3000, 12);
+
+insert into angajat
+values(seq_angajat.nextval, 'Marius','David', 37,TO_DATE('04-12-1985', 'dd-mm-yyyy'), 2480, 13);
+
+insert into angajat
+values(seq_angajat.nextval, 'Ion','Marian', 50,TO_DATE('09-06-1972', 'dd-mm-yyyy'), 2998, 14);
+
+insert into angajat
+values(seq_angajat.nextval, 'Cornel','Ionut', 34, TO_DATE('25-10-1988', 'dd-mm-yyyy'),2000, 15);
+
+insert into angajat
+values(seq_angajat.nextval, 'Gheorghe','Ana', 39,TO_DATE('29-11-1983', 'dd-mm-yyyy'), 2500, 16);
+
+insert into angajat
+values(seq_angajat.nextval, 'Pavel','George', 51, TO_DATE('03-05-1971', 'dd-mm-yyyy'),2657, 17);
+
+insert into angajat
+values(seq_angajat.nextval, 'Marius','Ion', 30,TO_DATE('08-12-1992', 'dd-mm-yyyy'), 3100, 18);
+
+insert into angajat
+values(seq_angajat.nextval, 'Agache','Maria', 40, TO_DATE('04-10-1982', 'dd-mm-yyyy'),2150, 19);
+
+insert into angajat
+values(seq_angajat.nextval, 'Petru','Costel', 35,TO_DATE('04-05-1987', 'dd-mm-yyyy'), 2876, 20);
+
+insert into angajat
+values(seq_angajat.nextval, 'Alexandru','Ioana', 25, TO_DATE('10-10-1997', 'dd-mm-yyyy'),1500, 21);
+
+insert into angajat
+values(seq_angajat.nextval, 'Ionescu','Carmen', 30,TO_DATE('05-11-1992', 'dd-mm-yyyy'), 2500, 22);
+
+insert into angajat
+values(seq_angajat.nextval, 'Pavel','Mirel', 22,TO_DATE('10-12-2000', 'dd-mm-yyyy'), 1458, 23);
+
+insert into angajat
+values(seq_angajat.nextval, 'Mitrel','Ionut', 28,TO_DATE('12-09-1994', 'dd-mm-yyyy'), 2480, 24);
+
+insert into angajat
+values(seq_angajat.nextval, 'Cordean','Marin', 32,TO_DATE('12-02-1990', 'dd-mm-yyyy'), 1376, 25);
+
+insert into angajat
+values(seq_angajat.nextval, 'Ionescu','Alexandra', 34, TO_DATE('04-03-1988', 'dd-mm-yyyy'),2000, 26);
+
+insert into angajat
+values(seq_angajat.nextval, 'Petre','Alin', 27,TO_DATE('05-11-1995', 'dd-mm-yyyy'), 2000, 27);
+
+insert into angajat
+values(seq_angajat.nextval, 'Cornel','Ioan', 34,TO_DATE('10-10-1988', 'dd-mm-yyyy'), 2657, 28);
+
+insert into angajat
+values(seq_angajat.nextval, 'Ion','Ana', 24,TO_DATE('03-04-1998', 'dd-mm-yyyy'), 1500, 29);
+
+insert into angajat
+values(seq_angajat.nextval, 'Popescu','Elena', 34, TO_DATE('12-10-1988', 'dd-mm-yyyy'),2150, 30);
+
+commit;
+
+
+insert into sufera
+values(1, 1);
+
+insert into sufera
+values(1, 2);
+
+insert into sufera
+values(1, 4);
+
+insert into sufera
+values(2, 1);
+
+insert into sufera
+values(2, 3);
+
+insert into sufera
+values(3, 1);
+
+insert into sufera
+values(3, 2);
+
+insert into sufera
+values(3, 3);
+
+insert into sufera
+values(3, 5);
+
+insert into sufera
+values(5, 1);
+
+commit;
+
+
+insert into se_treateaza
+values(1, 1);
+
+insert into se_treateaza
+values(1, 2);
+
+insert into se_treateaza
+values(1, 4);
+
+insert into se_treateaza
+values(2, 1);
+
+insert into se_treateaza
+values(2, 3);
+
+insert into se_treateaza
+values(3, 1);
+
+insert into se_treateaza
+values(3, 2);
+
+insert into se_treateaza
+values(3, 3);
+
+insert into se_treateaza
+values(3, 5);
+
+insert into se_treateaza
+values(5, 1);
+
+commit;
+
+
+insert into mananca
+values(1, 1);
+
+insert into mananca
+values(1, 12);
+
+insert into mananca
+values(1, 4);
+
+insert into mananca
+values(2, 10);
+
+insert into mananca
+values(2, 3);
+
+insert into mananca
+values(3, 9);
+
+insert into mananca
+values(3, 11);
+
+insert into mananca
+values(3, 2);
+
+insert into mananca
+values(3, 12);
+
+insert into mananca
+values(5, 10);
+
+commit;
+
+
+
+--6.
+--Afisati numele animalelor si numele bolii/bolilor de care sufera
+--pentru animalele ale caror varsta este mai mica sau egala cu gravitatea bolii.
+--Folositi tablouri indexate si tablouri imbricate pentru a rezolva problema data.
+
+create or replace procedure ex6 
+    is
+        type t1 is table of varchar2(30);
+        nume_animale t1 := t1();
+        type t2 is table of varchar2(30) index by pls_integer;
+        nume_boli t2;
+    begin
+        select distinct a.nume
+        bulk collect into nume_animale
+        from animal a, sufera s, boala b
+        where a.id_animal = s.id_animal and s.id_boala = b.id_boala and
+        a.varsta in (select b2.gravitate
+                        from animal a2 join sufera s2 on (a2.id_animal = s2.id_animal)
+                        join boala b2 on (s2.id_boala = b2.id_boala)
+                        where b2.gravitate <= a.varsta)
+        group by a.nume, b.nume, b.gravitate;
+        
+        select distinct b.nume
+        bulk collect into nume_boli
+        from animal a, sufera s, boala b
+        where a.id_animal = s.id_animal and s.id_boala = b.id_boala and
+        a.varsta in (select b2.gravitate
+                        from animal a2 join sufera s2 on (a2.id_animal = s2.id_animal)
+                        join boala b2 on (s2.id_boala = b2.id_boala)
+                        where b2.gravitate <= a.varsta)
+        group by a.nume, b.nume, b.gravitate;
+
+        
+        for i in nume_animale.first..nume_animale.last loop
+            dbms_output.put_line(nume_animale(i) || ' sufera de:');
+            for j in nume_boli.first..nume_boli.last loop
+                dbms_output.put_line(nume_boli(j));
+            end loop;
+        end loop;
+    exception
+        when NO_DATA_FOUND then
+            raise_application_error(-20000, 'Nu exista niciun animal cu aceste proprietati');
+        when TOO_MANY_ROWS then 
+            raise_application_error(-20001, 'Exista mai multe animale cu aceste proprietati');
+        when OTHERS then
+            raise_application_error(-20002, 'Alta eroare!');
+    end;
+/
+
+begin
+    ex6;
+end;
+/
+
+
+
+--7.
+--In luna august personalul din centrele de adoptie sunt in
+--vacanta. Vrem sa stim ce animale au primit vaccinul inaine de 
+--vacanta, si ce animale au primit vaccinul dupa vacanta, in 
+--anul trecut, pentru animalele care au mai mult de un numar
+--dat de vaccinuri.
+--Afisati numele animalului , varsta lui, iar pentru fiecare 
+--situatie, afisati un text semnificativ. Folositi un cursor 
+--explicit si un ciclu cursor cu subcereri pentru a rezolva problema.
+
+create or replace procedure ex7
+        (v_nr_vaccinuri carnet_vaccinuri.nr_vaccinuri%type)
+    is
+        v_id animal.id_animal%type;
+        v_nume animal.nume%type;
+        v_varsta animal.varsta%type;
+        v_nume2 animal.nume%type;
+        cursor c is 
+            select id_animal, nume , varsta 
+            from animal;
+            
+    begin
+        open c;
+        loop
+            fetch c into v_id, v_nume, v_varsta;
+            exit when c%notfound;
+            for j in ( select c.data_urmatorului_vaccin data_v, c.nr_vaccinuri nr
+                        from carnet_vaccinuri c
+                        where c.id_animal = v_id) loop
+                if j.nr >v_nr_vaccinuri then
+                    dbms_output.put_line(v_nume || '. Varsta: ' || v_varsta );
+                    if extract(year from j.data_v) = extract(year from sysdate) - 1 then
+                        if extract(month from j.data_v) < 8 then
+                            dbms_output.put_line('Vaccinul a fost facut inainte de vacanta');
+                        elsif extract(month from j.data_v) > 8 then
+                            dbms_output.put_line('Vaccinul a fost facut dupa vacanta');
+                        else
+                            dbms_output.put_line('Vaccinul trebuia facut in vacanta!');
+                        end if;
+                    end if;
+                end if;
+            end loop;
+        end loop;
+        
+    exception
+        when NO_DATA_FOUND then
+            raise_application_error(-20000, 'Nu exista animale cu acel numar de vaccinuri sau mai mare');
+        when TOO_MANY_ROWS then
+            raise_application_error(-20001, 'Sunt prea multe animale care indeplinesc criteriul');
+        when OTHERS then
+            raise_application_error(-20002, 'Alta eroare!');
+            
+    end;
+/
+            
+begin
+    ex7(1);
+end;
+/
+
+
+--8
+--Pentru un oras dat, afisati numarul de animalute date spre
+--adoptie ce sunt bagate in baza noastra de date. Daca orasul
+--dat ca parametru nu face parte din Romania, tratati exceptia
+--cu un mesaj corespunzator. Daca nu sunt animale date spre adoptie
+--in baza noastra de date din orasul dat ca parametru, tratati exceptia
+--cu un mesaj corespunzator.
+
+create or replace function ex8
+    (v_oras oras.nume%type default 'Craiova')
+return number 
+is
+    nr_animale number;
+    exceptie1 exception;
+    exceptie2 exception;
+    v_tara tara.nume%type;
+    begin
+        select t.nume
+        into v_tara
+        from tara t join oras o on (t.id_tara = o.id_tara)
+        where o.nume = v_oras;
+        
+        if v_tara != 'Romania' then
+            raise exceptie1;
+        end if;
+        
+        select count(a.nume)
+        into nr_animale
+        from animal a join centru_de_adoptie ca on (a.id_centru = ca.id_centru)
+        join oras o on (ca.id_oras = o.id_oras)
+        where o.nume = v_oras;
+        
+        if nr_animale = 0 then 
+            raise exceptie2;
+        end if;
+        return nr_animale;
+    exception
+       when exceptie1 then
+            raise_application_error(-20000,'Orasul transmis ca parametru nu face parte din Romania');
+        when exceptie2 then
+            raise_application_error(-20001,'Nu exista animale date spre adoptie in baza noastra de date din orasul dat ca parametru.');
+    end;
+/
+
+begin
+    dbms_output.put_line('Este/sunt ' || ex8('Navodari') || ' animalut/animalute de adoptat!');
+end;
+/
+  
+begin
+    dbms_output.put_line('Este/sunt ' || ex8('Roma') || ' animalut/animalute de adoptat!');
+end;
+/
+
+begin
+        dbms_output.put_line('Este/sunt ' || ex8('Constanta') || ' animalut/animalute de adoptat!');
+end;
+/
+
+--9
+--Pentru un centru de adoptie dat, realizati un top 3 angajati ordonati dupa salariu
+--al departamentului cu cei mai multi angajati. Tratati cazurile ce pot duce
+--la erori.
+create or replace procedure ex9
+    (v_centru centru_de_adoptie.nume%type)
+is 
+    type tab_centre is table of centru_de_adoptie.nume%type;
+    var_centre tab_centre;
+    ok number :=0;
+    top number :=0;
+    var_departament departament.id_departament%type;
+    var_max number;
+    var_nume_dep departament.nume%type;
+    exceptie exception;
+    begin
+        select nume 
+        bulk collect into var_centre
+        from centru_de_adoptie;
+        
+        for i in var_centre.first..var_centre.last loop
+            if v_centru = var_centre(i) then
+                ok := 1;
+                exit;
+            end if;
+        end loop;
+        if ok = 0 then
+            raise exceptie;
+        end if;
+        select max(count(a.id_angajat))
+        into var_max
+        from departament d left outer join job j on (d.id_departament = j.id_departament)
+        left outer join angajat a on (j.id_job = a.id_job) , personal p, centru_de_adoptie ca
+        where d.id_personal = p.id_personal and ca.id_centru = p.id_centru and ca.nume = v_centru
+        group by d.nume;
+        
+        select distinct d.id_departament , d.nume
+        into var_departament, var_nume_dep
+        from departament d left outer join job j on (d.id_departament = j.id_departament)
+        left outer join angajat a on (j.id_job = a.id_job) , personal p, centru_de_adoptie ca
+        where d.id_personal = p.id_personal and ca.id_centru = p.id_centru and ca.nume = v_centru and
+        (
+            select count(a1.id_angajat)
+            from departament d1 left outer join job j1 on (d1.id_departament = j1.id_departament)
+            left outer join angajat a1 on (j1.id_job = a1.id_job) , personal p1, centru_de_adoptie ca1
+            where d1.id_personal = p1.id_personal and ca1.id_centru = p1.id_centru and ca1.nume = v_centru and 
+            d1.id_departament = d.id_departament
+            group by d1.nume) = var_max;
+        
+        dbms_output.put_line('Departamentul: ' || var_nume_dep);
+        top := 0;
+        for j in (select a.nume nume, a.prenume prenume, a.salariu salariu
+                    from centru_de_adoptie ca join personal p on (ca.id_centru = p.id_centru)
+                    join departament d on (p.id_personal = d.id_personal)
+                    join job jo on (d.id_departament = jo.id_departament)
+                    join angajat a on (jo.id_job = a.id_job)
+                    where ca.nume = v_centru and d.id_departament = var_departament
+                    order by a.salariu desc) loop
+            top := top + 1;
+            dbms_output.put_line(top || '. ' || j.nume || ' ' || j.prenume || ': ' || j.salariu);
+            exit when top = 3;
+        end loop;
+    exception 
+        when exceptie then
+            raise_application_error(-20000, 'Acest centru de adoptie nu este introdus in baza noastra de date');
+        when NO_DATA_FOUND then
+            raise_application_error(-20001, 'In centrul de adoptie introdus inca nu s-au angajat oameni');
+        when TOO_MANY_ROWS then
+            raise_application_error(-20002, 'Prea multi angajati');
+        when OTHERS then
+            raise_application_error(-20003, 'Alta eroare!');
+    end;
+/
+begin
+    ex9('Animalutele fericite');
+end;
+/
+begin
+    ex9('Animalia');
+end;
+/
+begin 
+    ex9('abs');
+end;
+/
+
+
+--10
+--Pentru a putea adauga un alt centru de adoptie in baza de date,
+--trebuie ca toate centrele de adoptie sa isi atinga capacitatea 
+--maxima, aceasta fiind de 10 angajati. Daca cel putin un centru
+--nu indeplineste aceasta conditie, atunci nu se poate adauga alt centru.
+--Creeati un trigger ce previne acest lucru.
+create or replace trigger ex10
+    before insert on centru_de_adoptie
+declare 
+    type tab_nr is table of number;
+    nr_angajati tab_nr;
+begin
+    select count(a.nume)
+    bulk collect into nr_angajati
+    from centru_de_adoptie ca join personal p on (ca.id_centru = p.id_centru)
+    join departament d on (p.id_personal = d.id_personal)
+    join job j on (d.id_departament = j.id_departament)
+    join angajat a on (j.id_job = a.id_job)
+    group by ca.id_centru; 
+    
+    for i in nr_angajati.first..nr_angajati.last loop
+        if nr_angajati(i) < 10 then
+            raise_application_error(-20001, 'Centrele nu si-au atins capacitatea maxima de angajati');
+        end if;
+    end loop;
+end;
+/
+insert into centru_de_adoptie
+values(seq_centru.nextval, 'abc', to_date('12/02/2009', 'dd/mm/yyyy'), 28, 1);
+
+
+
+--11
+--La fiecare adaugare sau stergere a unui animal in baza noastra
+--de date, au de suferit atat tabelul ce retine animalele, cat si altele.
+--La fiecare stergere a unui animal, trebuie reactualizat numarul de animale
+--adoptate din centrul de adoptie in care a fost animalul. La fiecare
+--introducere a unui nou animal, trebuie reactualizat numarul de animale 
+--adoptate din centru de adoptie in care ajunge animalul.
+--Orice nou animal primeste ca hrana mancare denumita 'Chonk',
+--primeste vaccinul 'Eurican', si i se face un carnet de vaccinuri.
+--Realizati un trigger ce actualizeaza automat aceste date.
+create or replace trigger ex11
+    after delete or insert on animal
+    for each row
+
+    declare
+        id_v vaccin.id_vaccin%type;
+    begin
+        if deleting then
+            update centru_de_adoptie
+            set nr_animale_adoptate = nr_animale_adoptate - 1
+            where id_centru = :old.id_centru;
+            
+        else
+            update centru_de_adoptie
+            set nr_animale_adoptate = nr_animale_adoptate + 1
+            where id_centru = :new.id_centru;
+            
+            insert into mananca
+            values(:new.id_animal, 1);
+            
+            id_v := seq_vaccin.nextval;
+            
+            insert into vaccin
+            values(id_v, 'Eurican', to_date(to_char(sysdate, 'dd-mm-yyyy'), 'dd-mm-yyyy'), :new.id_animal);
+            
+            insert into carnet_vaccinuri
+            values(seq_carnet.nextval, :new.id_animal, id_v, 1, to_date(to_char(sysdate + 365, 'dd-mm-yyyy'), 'dd-mm-yyyy'));
+        end if;
+    end;
+/
+select * from centru_de_adoptie;
+
+delete from animal 
+where id_animal = 1;
+
+select * from centru_de_adoptie;
+
+insert into animal
+values(seq_animal.nextval, 'nu stim', 5, 'Coco', 3, 'nu are');
+
+select * from centru_de_adoptie;
+
+select * from animal;
+
+select * from carnet_vaccinuri;
+
+select * from mananca;
+
+select * from vaccin;
+
+
+--12
+--Creati tabelul 'utilizatori' cu urmatoarele coloane: user_name, 
+--comanda, nume_tabel, data_executiei. Creati un trigger care sa 
+--introduca aceste date in tabel atunci cand un tabel este creat, sters
+--sau actualizat.
+create table utilizatori
+(
+    user_name varchar2(30),
+    comanda varchar2(30),
+    nume_tabel varchar2(4000),
+    data_executiei date
+);
+
+create or replace trigger ex12
+    before create or alter or drop on schema
+
+    begin
+        insert into utilizatori 
+        values (sys.login_user, sys.sysevent, ora_dict_obj_name, sysdate);
+    end;
+/
+
+create table test
+(
+    nume varchar2(30)
+);
+drop table test;
+select * from utilizatori;
+
+--13
+
+create or replace package ex13 as
+    procedure ex6;
+    procedure ex7 (v_nr_vaccinuri carnet_vaccinuri.nr_vaccinuri%type);
+    function ex8 (v_oras oras.nume%type default 'Craiova')
+       return number;
+    procedure ex9 (v_centru centru_de_adoptie.nume%type);
+end ex13;
+/
+
+create or replace package body ex13 as
+    procedure ex6 
+        is
+            type t1 is table of varchar2(30);
+            nume_animale t1 := t1();
+            type t2 is table of varchar2(30) index by pls_integer;
+            nume_boli t2;
+        begin
+            select distinct a.nume
+            bulk collect into nume_animale
+            from animal a, sufera s, boala b
+            where a.id_animal = s.id_animal and s.id_boala = b.id_boala and
+            a.varsta in (select b2.gravitate
+                            from animal a2 join sufera s2 on (a2.id_animal = s2.id_animal)
+                            join boala b2 on (s2.id_boala = b2.id_boala)
+                            where b2.gravitate <= a.varsta)
+            group by a.nume, b.nume, b.gravitate;
+            
+            select distinct b.nume
+            bulk collect into nume_boli
+            from animal a, sufera s, boala b
+            where a.id_animal = s.id_animal and s.id_boala = b.id_boala and
+            a.varsta in (select b2.gravitate
+                            from animal a2 join sufera s2 on (a2.id_animal = s2.id_animal)
+                            join boala b2 on (s2.id_boala = b2.id_boala)
+                            where b2.gravitate <= a.varsta)
+            group by a.nume, b.nume, b.gravitate;
+    
+            
+            for i in nume_animale.first..nume_animale.last loop
+                dbms_output.put_line(nume_animale(i) || ' sufera de:');
+                for j in nume_boli.first..nume_boli.last loop
+                    dbms_output.put_line(nume_boli(j));
+                end loop;
+            end loop;
+        exception
+            when NO_DATA_FOUND then
+                raise_application_error(-20000, 'Nu exista niciun animal cu aceste proprietati');
+            when TOO_MANY_ROWS then 
+                raise_application_error(-20001, 'Exista mai multe animale cu aceste proprietati');
+            when OTHERS then
+                raise_application_error(-20002, 'Alta eroare!');
+    end;
+    
+    procedure ex7
+            (v_nr_vaccinuri carnet_vaccinuri.nr_vaccinuri%type)
+        is
+            v_id animal.id_animal%type;
+            v_nume animal.nume%type;
+            v_varsta animal.varsta%type;
+            v_nume2 animal.nume%type;
+            cursor c is 
+                select id_animal, nume , varsta 
+                from animal;
+                
+        begin
+            open c;
+            loop
+                fetch c into v_id, v_nume, v_varsta;
+                exit when c%notfound;
+                for j in ( select c.data_urmatorului_vaccin data_v, c.nr_vaccinuri nr
+                            from carnet_vaccinuri c
+                            where c.id_animal = v_id) loop
+                    if j.nr >v_nr_vaccinuri then
+                        dbms_output.put_line(v_nume || '. Varsta: ' || v_varsta );
+                        if extract(year from j.data_v) = extract(year from sysdate) - 1 then
+                            if extract(month from j.data_v) < 8 then
+                                dbms_output.put_line('Vaccinul a fost facut inainte de vacanta');
+                            elsif extract(month from j.data_v) > 8 then
+                                dbms_output.put_line('Vaccinul a fost facut dupa vacanta');
+                            else
+                                dbms_output.put_line('Vaccinul trebuia facut in vacanta!');
+                            end if;
+                        end if;
+                    end if;
+                end loop;
+            end loop;
+            
+        exception
+            when NO_DATA_FOUND then
+                raise_application_error(-20000, 'Nu exista animale cu acel numar de vaccinuri sau mai mare');
+            when TOO_MANY_ROWS then
+                raise_application_error(-20001, 'Sunt prea multe animale care indeplinesc criteriul');
+            when OTHERS then
+                raise_application_error(-20002, 'Alta eroare!');
+            
+    end;
+    
+    function ex8
+            (v_oras oras.nume%type default 'Craiova')
+        return number 
+        is
+            nr_animale number;
+            exceptie1 exception;
+            exceptie2 exception;
+            v_tara tara.nume%type;
+        begin
+            select t.nume
+            into v_tara
+            from tara t join oras o on (t.id_tara = o.id_tara)
+            where o.nume = v_oras;
+            
+            if v_tara != 'Romania' then
+                raise exceptie1;
+            end if;
+            
+            select count(a.nume)
+            into nr_animale
+            from animal a join centru_de_adoptie ca on (a.id_centru = ca.id_centru)
+            join oras o on (ca.id_oras = o.id_oras)
+            where o.nume = v_oras;
+            
+            if nr_animale = 0 then 
+                raise exceptie2;
+            end if;
+            return nr_animale;
+        exception
+           when exceptie1 then
+                raise_application_error(-20000,'Orasul transmis ca parametru nu face parte din Romania');
+            when exceptie2 then
+                raise_application_error(-20001,'Nu exista animale date spre adoptie in baza noastra de date din orasul dat ca parametru.');
+    end;
+    
+    procedure ex9
+            (v_centru centru_de_adoptie.nume%type)
+        is 
+            type tab_centre is table of centru_de_adoptie.nume%type;
+            var_centre tab_centre;
+            ok number :=0;
+            top number :=0;
+            var_departament departament.id_departament%type;
+            var_max number;
+            var_nume_dep departament.nume%type;
+            exceptie exception;
+        begin
+            select nume 
+            bulk collect into var_centre
+            from centru_de_adoptie;
+            
+            for i in var_centre.first..var_centre.last loop
+                if v_centru = var_centre(i) then
+                    ok := 1;
+                    exit;
+                end if;
+            end loop;
+            if ok = 0 then
+                raise exceptie;
+            end if;
+            select max(count(a.id_angajat))
+            into var_max
+            from departament d left outer join job j on (d.id_departament = j.id_departament)
+            left outer join angajat a on (j.id_job = a.id_job) , personal p, centru_de_adoptie ca
+            where d.id_personal = p.id_personal and ca.id_centru = p.id_centru and ca.nume = v_centru
+            group by d.nume;
+            
+            select distinct d.id_departament , d.nume
+            into var_departament, var_nume_dep
+            from departament d left outer join job j on (d.id_departament = j.id_departament)
+            left outer join angajat a on (j.id_job = a.id_job) , personal p, centru_de_adoptie ca
+            where d.id_personal = p.id_personal and ca.id_centru = p.id_centru and ca.nume = v_centru and
+            (
+                select count(a1.id_angajat)
+                from departament d1 left outer join job j1 on (d1.id_departament = j1.id_departament)
+                left outer join angajat a1 on (j1.id_job = a1.id_job) , personal p1, centru_de_adoptie ca1
+                where d1.id_personal = p1.id_personal and ca1.id_centru = p1.id_centru and ca1.nume = v_centru and 
+                d1.id_departament = d.id_departament
+                group by d1.nume) = var_max;
+            
+            dbms_output.put_line('Departamentul: ' || var_nume_dep);
+            top := 0;
+            for j in (select a.nume nume, a.prenume prenume, a.salariu salariu
+                        from centru_de_adoptie ca join personal p on (ca.id_centru = p.id_centru)
+                        join departament d on (p.id_personal = d.id_personal)
+                        join job jo on (d.id_departament = jo.id_departament)
+                        join angajat a on (jo.id_job = a.id_job)
+                        where ca.nume = v_centru and d.id_departament = var_departament
+                        order by a.salariu desc) loop
+                top := top + 1;
+                dbms_output.put_line(top || '. ' || j.nume || ' ' || j.prenume || ': ' || j.salariu);
+                exit when top = 3;
+            end loop;
+        exception 
+            when exceptie then
+                raise_application_error(-20000, 'Acest centru de adoptie nu este introdus in baza noastra de date');
+            when NO_DATA_FOUND then
+                raise_application_error(-20001, 'In centrul de adoptie introdus inca nu s-au angajat oameni');
+            when TOO_MANY_ROWS then
+                raise_application_error(-20002, 'Prea multi angajati');
+            when OTHERS then
+                raise_application_error(-20003, 'Alta eroare!');
+    end;
+end ex13;
+/
+
+begin
+     ex13.ex6;
+     dbms_output.new_line();
+     ex13.ex7(1);
+     dbms_output.new_line();
+     dbms_output.put_line('Este/sunt ' || ex8('Navodari') || ' animalut/animalute de adoptat!');
+     dbms_output.new_line();
+     ex13.ex9('Animalutele fericite');
+end;
+/
+
+create or replace package ex14 as
+    type tab_animal is varray(100) of animal.nume%type;
+    type tab_hrana is table of hrana_animale.nume%type;
+    type tab_medicament is table of medicament.nume%type;
+    type tab_nr is table of number;
+    procedure p1 (v_centru centru_de_adoptie.nume%type);
+    procedure p2 (v_animal animal.nume%type);
+    procedure p3 (v_boala boala.nume%type);
+    function f1 (v_centru centru_de_adoptie.nume%type)
+        return number;
+    function f2 (v_id centru_de_adoptie.id_centru%type)
+        return number;
+--    function f3 (v_animal animal.nume%type)
+--        return number;
+end ex14;
+/
+
+create or replace package body ex14 as
+    var_animal tab_animal := tab_animal();
+    var_hrana tab_hrana := tab_hrana();
+    var_medicament tab_medicament := tab_medicament();
+    var_nr tab_nr := tab_nr();
+    procedure p1(v_centru centru_de_adoptie.nume%type) is
+    begin
+        select a.nume
+        bulk collect into var_animal
+        from centru_de_adoptie ca, animal a
+        where ca.id_centru = a.id_centru and ca.nume = v_centru;
+        
+        dbms_output.put_line('Animalele din centrul de adoptie ' || v_centru || ' sunt urmatoarele: ');
+        for i in var_animal.first..var_animal.last loop
+            dbms_output.put_line(var_animal(i));
+        end loop;
+        
+    exception
+        when no_data_found then
+            raise_application_error(-20001, 'Niciun animal gasit in acest centru');
+    end p1;
+    
+    procedure p2(v_animal animal.nume%type) is
+    begin
+        select h.nume
+        bulk collect into var_hrana
+        from animal a, mananca m, hrana_animale h
+        where a.id_animal = m.id_animal and m.id_hrana = h.id_hrana and a.nume = v_animal;
+        
+        dbms_output.put_line(v_animal || ' mananca urmatoarele: ');
+        for i in var_hrana.first..var_hrana.last loop
+            dbms_output.put_line(var_hrana(i));
+        end loop;
+        
+    exception
+        when no_data_found then
+            raise_application_error(-20001, 'Nu s-a introdus inca nimic in legatura cu mancarea acestui animal');
+    end p2;
+    
+    procedure p3(v_boala boala.nume%type) is
+    begin
+        select m.nume
+        bulk collect into var_medicament
+        from boala b, se_treateaza t, medicament m
+        where b.id_boala = t.id_boala and t.id_medicament = m.id_medicament and b.nume = v_boala;
+        
+        dbms_output.put_line(v_boala || 'se treateaza cu urmatoarele medicamente:');
+        for i in var_medicament.first..var_medicament.last loop
+            dbms_output.put_line(var_medicament(i));
+        end loop;
+    exception
+        when no_data_found then
+            raise_application_error(-20001, 'Nu s-a gasit niciun medicament ce poate trata aceasta boala');
+    end p3;
+    
+    function f1 (v_centru centru_de_adoptie.nume%type)
+        return number is
+        buget number := 0;
+        begin
+            select a.salariu
+            bulk collect into var_nr 
+            from centru_de_adoptie ca, personal p, departament d, job j, angajat a
+            where ca.id_centru = p.id_centru and p.id_personal = d.id_personal and 
+            d.id_departament = j.id_departament and j.id_job = a.id_job and 
+            ca.nume = v_centru;
+            
+            for i in var_nr.first..var_nr.last loop
+                buget := buget + var_nr(i);
+            end loop;
+            
+            return buget;
+         exception
+            when no_data_found then
+                raise_application_error(-20001, 'Nu sunt angajati in acest centru');
+        end f1;
+        
+    function f2 (v_id centru_de_adoptie.id_centru%type)
+        return number is 
+        nr number(2) :=0;
+        begin
+           select count(*)
+           into nr
+           from animal
+           where id_centru = v_id;
+           
+           return nr;
+            
+        end f2;
+        
+end ex14;
+/          
+        
+begin 
+    ex14.p1('Animalutele fericite');
+end;
+/
+begin
+    ex14.p2('Misha');
+end;
+/
+
+begin
+    ex14.p3('Parazitoza');
+end;
+/
+begin
+    dbms_output.put_line('Bugetul este de ' || ex14.f1('Animalutele fericite') || ' lei');
+end;
+/
+begin
+    dbms_output.put_line( ex14.f2(1) );
+end;
+/
